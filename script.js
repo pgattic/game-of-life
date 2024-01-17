@@ -1,5 +1,11 @@
 "use strict";
 
+// Game Rule constants
+const minNeighbors = 2; // Minimum neighbors required to survive. default 2
+const maxNeighbors = 3; // Maximum neighbors before a cell dies. default 3
+const requiredNeighbors = 3; // neighbors required to come to life. default 3
+const lives = 1; // default 1
+
 const
   $=(x)=>{return document.querySelector(x)},
   canvas = $("#canvas"),
@@ -47,7 +53,7 @@ for (let i = 0; i < boardHeight; i++) {
 function render() {
   for (let i = 0; i < board.length; i++) {
     for (let j = 0; j < board[i].length; j++) {
-      ctx.fillStyle = (board[i][j] ? "black": "white");
+      ctx.fillStyle = `hsl(0, 0%, ${100*(1-board[i][j]/lives)}%)`
       ctx.fillRect(j * blockSize, i * blockSize, blockSize, blockSize);
     }
   }
@@ -70,9 +76,9 @@ function calculate() {
       if (i < boardCopy.length-1 && j < boardCopy[i].length-1 && boardCopy[i+1][j+1]) { neighbors++; }
 
       if (boardCopy[i][j]) {
-        board[i][j] = (neighbors < 2 || neighbors > 3) ? 0 : 1;
+        board[i][j] = (neighbors < minNeighbors || neighbors > maxNeighbors) ? board[i][j]-1 : board[i][j];
       } else {
-        board[i][j] = (neighbors == 3) ? 1 : 0;
+        board[i][j] = (neighbors == requiredNeighbors) ? lives : 0;
       }
     }
   }
